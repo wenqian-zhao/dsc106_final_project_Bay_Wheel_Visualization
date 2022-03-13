@@ -1,0 +1,111 @@
+
+<html>  
+    <head>  
+    <script type="text/javascript" src="app.js">
+        </script>  
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-color@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-interpolate@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-scale@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-scale-chromatic@3"></script>
+    </head>
+    <body onload=final()> 
+    
+    
+    <div>
+    <h1 class="title"> Final Project of Group 50 </h1>
+    <h3 class="title"> Group Member: Wenbo Hu, Martin Thai, Wenqian Zhao</h3>
+    <div>
+        <b>We chose this dataset to deal with the issue of global warming and answering governments' efforts in promoting sustainability. 
+        Bike sharing has been an economical, ecological, and popular choice in dense city areas where the distance of traveling is relatively short. As this service is
+        not yet popular in the La Jolla area, we would like to dig more into this topic and discover some facts from our visualizations. </b>
+    </div>
+    <br>
+    <div>
+        The data is downloaded from Kaggle through https://www.kaggle.com/benhamner/sf-bay-area-bike-share.
+            
+    </div>
+    </div>
+    
+    <div>
+    <h3>Visualization 1:</h3>
+        <div>Goal:
+            <br>
+            Explore the trend of trips number in the past year monthly
+        </div>
+    <div id="Vis1">
+        </div>
+        <h4>Plot:</h4>
+        <select id="selectButtonVis1"></select>
+        <div id="vis1_plot" class="center_plot">
+        </div>
+    </div>    
+    </div>
+        
+    <div>
+    <h3>Question 2:</h3>
+        <div>Goal:<br>
+            Explore the relation between the temperature of the day and time duration of the bike ride
+        </div>
+    <div id="Vis2">
+        </div>
+        <h4>Plot:</h4>
+        <div id="vis3_plot" class="center_plot">
+        </div>
+    </div>    
+    
+    <div>
+    <h3>Question 3:</h3>
+        <div> Goal: <br>
+            Explore the average duration of different types of riders (customer or subscriber):
+            
+        </div>
+    <div id="Vis3">
+        <h4>Plot:</h4>
+        <div id="Vis3_plot" class="center_plot">
+        </div>
+    </div>    
+       
+    <div>
+    <h3>Visualization 4:</h3>
+        <div> Goal: <br>
+            Explore the linked relations between each stations, using the locations of bike stations by latitude and longitude: 
+    
+        </div>
+    <div id="Vis4">
+        </div>
+        <h4>Plot:</h4>
+        <div id="vis4_plot" class="center_plot">
+        </div>
+    </div>    
+    
+    <div>
+    <h3>Question 5:</h3>
+        <div> Problem Statement:<br>
+            [20 points] There is a nice correlation between the height and weight of athletes for specific sports. In this problem we will try to visualize this correlation. We will see this relationship between height and weight for three sports - Basketball, Gymnastics and Judo. Create a scatter plot to show the relationship between height and weight for the three sports mentioned above. Use different colors to represent different sports. Now let us see if this correlation is dependent on gender. Make use of two shades of a color to represent male and female athletes. Example : If you decided to represent basketball with red, plot the data points corresponding to female athletes with pink and male athletes with red.  Provide appropriate scale and axes to the plot. Do NOT hard code the scale/axes.
+    
+    
+    
+    
+        </div>
+    <div id="q5">
+        <br>
+        Color Scheme: Similar to Q3, I managed to use lighter color to denote female and dark color to denote male. Then, I used red, green, blue as my three main color for denoting different sports since I want to have the colors with mroe contract to display
+        different sports. Also, I tried to avoid using red and green to be color-blind friendly.
+        <br>
+        Key: sports and gender
+        <br>
+        Value: weight and height
+        <br>
+        Marks and Channels: Points: Position(horizontal and vertical), Color(denote gender and sports)
+        </div>
+        <h4>Plot:</h4>
+        <div id="q5_plot" class="center_plot">
+        </div>
+    </div>    
+       
+        
+       
+    </body>  
+    </html>  
