@@ -7,7 +7,9 @@ function final(){
     vis3(filePathV3);
     var filePathV4 = "dataset/data_cleaned_vis4.csv"
     vis4(filePathV4);
-    vis5(filePath);
+    var stationPath = "dataset/station_cleaned.csv";
+    var tripPath = "dataset/trip.json"
+    vis5(stationPath, tripPath);
 }
 
 //Question 1
@@ -357,6 +359,106 @@ var vis4=function(filePath){
 }
 
 
-var vis5=function(filePath){
+var vis5=function(stationPath, tripPath){
+    Promise.all([
+      d3.csv(stationPath),
+      d3.json(tripPath) 
+    ]).then(
+        function (initialize) {
+
+            let station = initialize[0]
+            let trip = initialize[1]
+
+            var width = 500;
+            var height = 300;
+            //var xCenter = [0, 100, 200， 300， 400， 500， 600,];
+            //var rScale = d3.scaleLinear().domain([0, d3.max(dataset.nodes, d => d.value)]).range([10, 45])
+            var force = d3.forceSimulation(station)
+                          .force("charge", d3.forceManyBody().strength(0))
+                          .force("link", d3.forceLink(data.edges))
+                          //.force("center", d3.forceCenter().x(width/2).y(height/2))
+                         // .force("collide", d3.forceCollide().radius(d => rScale(d.value)))
+                         // .force("x", d3.forceX().x(function(d) { return d.x}))
+                          //.force("y", d3.forceY().y(d => d.y))
+
+
+            //create the color array using an existing colormap
+            var colors = d3.scaleOrdinal(d3.schemeCategory10);
+
+            //create SVG canvas
+            var svg = d3.select("#vis5_plot")
+                        .append("svg")
+                        .attr("width", width)
+                        .attr("height", height);
+            
+            //create edges
+            var edges = svg.selectAll("line")
+                .data(trip)
+                .enter()
+                .append("line")
+                .attr("stroke", "lightgray")
+            
+            //create nodes
+            var nodes = svg.selectAll("circle")
+                .data(station)
+                .enter()
+                .append("circle")
+                .style("fill", function(d, i) {
+                    return colors(i);
+                })
+            
+            //when the simulation "ticks", execute the callback function
+            force.on("tick", function() {
+
+                edges.attr("x1", function(d) { return d.source.x; })
+                     .attr("y1", function(d) { return d.source.y; })
+                     .attr("x2", function(d) { return d.target.x; })
+                     .attr("y2", function(d) { return d.target.y; });
+            
+                nodes.attr("cx", function(d) { return d.x; })
+                     .attr("cy", function(d) { return d.y; })
+                     .attr("r", 10);
+
+        });
+    })
+}
+
+//leave it 
+var vis6=function(filePath){
+
+    var margin = {top: 40, right: 300, bottom: 40, left: 300},
+            width = 800 - margin.left - margin.right,
+            height = 600 - margin.top - margin.bottom;
+    var svg = d3.select("#vis5_plot")
+                    .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform",
+                        "translate(" + margin.left + "," + margin.top + ")");
+
+    // Map and projection
+    const projection = d3.geoMercator()
+        .center([10, 47])                // GPS of location to zoom on
+        .scale(1200)                       // This is like the zoom
+        .translate([ width/2, height/2 ])
+
+    // Load external data and boot
+    d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson").then( function(data){
+
+        // Filter data
+        data.features = data.features.filter(d => {console.log(d.properties.name); return d.properties.name=="France"})
+
+        // Draw the map
+        svg.append("g")
+            .selectAll("path")
+            .data(data.features)
+            .join("path")
+              .attr("fill", "grey")
+              .attr("d", d3.geoPath()
+                  .projection(projection)
+              )
+            .style("stroke", "none")
+    })
     
 }
