@@ -5,7 +5,8 @@ function final(){
     // vis2(filePath);
     var filePathV3 = "dataset/data_cleaned_vis3.csv"
     vis3(filePathV3);
-    vis4(filePath);
+    var filePathV4 = "dataset/data_cleaned_vis4.csv"
+    vis4(filePathV4);
     vis5(filePath);
 }
 
@@ -214,7 +215,145 @@ var vis3=function(filePath){
 }
 
 var vis4=function(filePath){
+    var data = d3.csv(filePath, d3.autoType);
+    data.then(function(bike){
+        console.log(bike);
+        var margin = {top: 40, right: 60, bottom: 20, left: 60},
+            width = 800 - margin.left - margin.right,
+            height = 400 - margin.top - margin.bottom;
+        var svg = d3.select("#vis4_plot")
+                    .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform",
+                        "translate(" + margin.left + "," + margin.top + ")");
+        const userType = ["Subscriber", "Customer"]
+        const months = bike.map(d=>d.month)
+        const xScale = d3.scaleBand()
+                         .domain(months)
+                         .rangeRound([0, width])
+                         .padding([0.2])
+        const yScaleStack = d3.scaleLinear()
+                         .domain([0, 16000])
+                         .range([height, 0])
+        xAxis = svg.append("g")
+                   .attr("transform", "translate(0," +height+ ")")
+                   .call(d3.axisBottom(xScale).tickSizeOuter(0))
+        yAxisStack = svg.append("g")
+                   .call(d3.axisLeft(yScaleStack).tickSizeOuter(0))
+                   .attr("opacity", 1);
+        const stacked = d3.stack().keys(userType)(bike)
+        var color = d3.scaleOrdinal()
+                      .domain(userType)
+                      .range(["#397EBF", "#F56E05"])
+                      
+        var barstack = svg.append("g")
+                          .selectAll(".g")
+                          .data(stacked)
+                          .enter()
+                          .append("g")
+                          .attr("fill", d=>color(d.key))
+                          .selectAll(".bars")
+                          .data(d=>d)
+                          .enter()
+                          .append("rect")
+                          .attr("x", d => xScale(d.data.month))
+                          .attr("y", d => yScaleStack(d[1]))
+                          .attr("height", d => yScaleStack(d[0]) - yScaleStack(d[1]))
+                          .attr("width",xScale.bandwidth())
+                          .attr("opacity", 1)
 
+        
+        var legend = svg.append("g").classed("legendVis4", true).attr("opacity", 1)
+        legend.selectAll(".rect")
+              .data(["Customer", "Subscriber"])
+              .enter()
+              .append("rect")
+              .attr("x", 565)
+              .attr("y", (d, i) => 0 + 15*i)
+              .attr("width", 11)
+              .attr("height", 11)
+              .attr("fill", d=>color(d))
+              
+        legend.selectAll(".text")
+              .data(["Casual Customer", "Subscriber"])
+              .enter()
+              .append("text")
+              .text(d=>d)
+              .attr("x", 578)
+              .attr("y", (d, i) => 11 + 15*i)
+        
+        const yScaleCus = d3.scaleLinear()
+                         .domain([0, d3.max(bike, d=>d.Customer)])
+                         .range([height, 0])
+        yAxisCus = svg.append("g")
+                   .call(d3.axisLeft(yScaleCus).tickSizeOuter(0))
+                   .attr("opacity", 0);
+        var barCus = svg.append("g")
+                        .selectAll("rect")
+                        .data(bike)
+                        .enter()
+                        .append("rect")
+                        .attr("x", d=>xScale(d.month))
+                        .attr("y", d=>yScaleCus(d.Customer))
+                        .attr("width", xScale.bandwidth)
+                        .attr("height", d=>height - yScaleCus(d.Customer))
+                        .attr("opacity", 0)
+                        .attr("fill", "#F56E05")
+
+
+        const yScaleSub = d3.scaleLinear()
+                         .domain([0, d3.max(bike, d=>d.Subscriber)])
+                         .range([height, 0])
+        yAxisSub = svg.append("g")
+                    .call(d3.axisLeft(yScaleSub).tickSizeOuter(0))
+                    .attr("opacity", 0);
+        var barSub= svg.append("g")
+                        .selectAll("rect")
+                        .data(bike)
+                        .enter()
+                        .append("rect")
+                        .attr("x", d=>xScale(d.month))
+                        .attr("y", d=>yScaleSub(d.Subscriber))
+                        .attr("width", xScale.bandwidth)
+                        .attr("height", d=>height - yScaleSub(d.Subscriber))
+                        .attr("opacity", 0)
+                        .attr("fill", "#397EBF")
+
+        
+        var radios = d3.selectAll("input[name='controlBar']");
+        radios.on("change", function(d) {
+            var group = d3.select(this).attr("value");
+            if (group == "stack") {
+                yAxisSub.transition().attr("opacity", 0).duration(600);
+                barSub.transition().attr("opacity", 0).duration(600);
+                barCus.transition().attr("opacity", 0).duration(600);
+                yAxisCus.transition().attr("opacity", 0).duration(600);
+                legend.transition().attr("opacity", 1).duration(600);
+                barstack.transition().attr("opacity", 1).duration(600);
+                yAxisStack.transition().attr("opacity", 1).duration(600);
+            }
+            if (group == "Casual Customers") {
+                yAxisSub.transition().attr("opacity", 0).duration(600);
+                barSub.transition().attr("opacity", 0).duration(600);
+                barCus.transition().attr("opacity", 1).duration(600);
+                yAxisCus.transition().attr("opacity", 1).duration(600);
+                legend.transition().attr("opacity", 0).duration(600);
+                barstack.transition().attr("opacity", 0).duration(600);
+                yAxisStack.transition().attr("opacity", 0).duration(600);
+            }
+            if (group == "Subscribers") {
+                yAxisSub.transition().attr("opacity", 1).duration(600);
+                barSub.transition().attr("opacity", 1).duration(600);
+                barCus.transition().attr("opacity", 0).duration(600);
+                yAxisCus.transition().attr("opacity", 0).duration(600);
+                legend.transition().attr("opacity", 0).duration(600);
+                barstack.transition().attr("opacity", 0).duration(600);
+                yAxisStack.transition().attr("opacity", 0).duration(600);
+            }
+        })
+    })
 }
 
 
