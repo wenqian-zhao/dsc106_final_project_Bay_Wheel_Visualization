@@ -7,9 +7,8 @@ function final(){
     vis3(filePathV3);
     var filePathV4 = "dataset/data_cleaned_vis4.csv"
     vis4(filePathV4);
-    var stationPath = "dataset/station_cleaned.csv";
-    var tripPath = "dataset/trip.json"
-    vis5(stationPath, tripPath);
+    var filePathV5 = "dataset/vis5boxplot_1_1_hot_8_cheat_cleaned.csv";
+    vis5(filePathV5);
 }
 
 //Question 1
@@ -359,7 +358,117 @@ var vis4=function(filePath){
 }
 
 
-var vis5=function(stationPath, tripPath){
+var vis5=function(filePath){ 
+
+    var margin = {top: 10, right: 30, bottom: 200, left: 40},
+        width = 1200 - margin.left - margin.right,
+        height = 800 - margin.top - margin.bottom;
+
+    // append the svg object to the body of the page
+    var svg = d3.select("#vis5_plot")
+      .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform",
+              "translate(" + margin.left + "," + margin.top + ")");
+
+    // Read the data and compute summary statistics for each specie
+    var df = d3.csv(filePath, d3.autoType);
+    df.then(function(data){
+
+      cleaned = d3.flatGroup(data, d=> d.start_station_name)
+      //console.log(cleaned)
+      sumstat = []
+      for(let i =0; i < cleaned.length; i++){
+        temp = {}
+        vals = cleaned[i][1]
+        var p100 = vals.map(d => d.duration).sort(d3.ascending)
+        q1 = d3.quantile(p100,.25)
+        median = d3.quantile(p100,.5)
+        q3 = d3.quantile(p100,.75)
+        interQuantileRange = q3 - q1
+        min = q1 - 1.5 * interQuantileRange
+        max = q3 + 1.5 * interQuantileRange
+        sumstat.push({key:cleaned[i][0], q1: q1, median: median, q3: q3, 
+        interQuantileRange: interQuantileRange, min: min, max: max})
+      }
+
+      console.log(sumstat)
+
+      // Show the X scale
+      var x = d3.scaleBand()
+        .range([ 0, width ])
+        .domain(['Embarcadero at Sansome', 'Harry Bridges Plaza (Ferry Building)',
+               'Steuart at Market', 'Market at 4th', 'Embarcadero at Bryant',
+               'Powell Street BART', 'Mechanics Plaza (Market at Battery)'])
+        .paddingInner(1)
+        .paddingOuter(.5)
+      svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x))
+        .selectAll("text")
+              .attr("transform", "translate(-10,0)rotate(-45)")
+              .style("text-anchor", "end");
+
+      // Show the Y scale
+      var y = d3.scaleLinear()
+        .domain([0,9000])
+        .range([height, 0])
+      svg.append("g").call(d3.axisLeft(y))
+
+      // Show the main vertical line
+      svg
+        .selectAll("vertLines")
+        .data(sumstat)
+        .enter()
+        .append("line")
+          .attr("x1", function(d){return(x(d.key))})
+          .attr("x2", function(d){return(x(d.key))})
+          .attr("y1", function(d){return(y(d.min))})
+          .attr("y2", function(d){return(y(d.max))})
+          .attr("stroke", "black")
+          .style("width", 40)
+
+      // rectangle for the main box
+      var boxWidth = 100
+      svg
+        .selectAll("boxes")
+        .data(sumstat)
+        .enter()
+        .append("rect")
+            .attr("x", function(d){return(x(d.key)-boxWidth/2)})
+            .attr("y", function(d){return(y(d.q3))})
+            .attr("height", function(d){return(y(d.q1)-y(d.q3))})
+            .attr("width", boxWidth )
+            .attr("stroke", "black")
+            .style("fill", "#69b3a2")
+
+      // Show the median
+      svg
+        .selectAll("medianLines")
+        .data(sumstat)
+        .enter()
+        .append("line")
+          .attr("x1", function(d){return(x(d.key)-boxWidth/2) })
+          .attr("x2", function(d){return(x(d.key)+boxWidth/2) })
+          .attr("y1", function(d){return(y(d.median))})
+          .attr("y2", function(d){return(y(d.median))})
+          .attr("stroke", "black")
+          .style("width", 80)
+
+      svg.append("text")
+        .attr("x", 500)
+        .attr("y", 30)
+        .attr("text-anchor", "left")
+        .style("font-size", "22px")
+        .text("Duration of 7 hottest SF stations");
+
+    })
+
+}
+
+var discardedvis5=function(stationPath, tripPath){
     Promise.all([
       d3.csv(stationPath),
       d3.json(tripPath) 
@@ -368,6 +477,7 @@ var vis5=function(stationPath, tripPath){
 
             let station = initialize[0]
             let trip = initialize[1]
+
 
             var width = 500;
             var height = 300;
@@ -424,7 +534,7 @@ var vis5=function(stationPath, tripPath){
 }
 
 //leave it 
-var vis6=function(filePath){
+var discardedvis6=function(filePath){
 
     var margin = {top: 40, right: 300, bottom: 40, left: 300},
             width = 800 - margin.left - margin.right,
