@@ -59,6 +59,7 @@ var vis1=function(filePath){
                        .append("option")
                        .text(d=>d)
                        .attr("value", d=>d)
+        d3.select("#vis1_title").text("Number of Trips Throughout 2014")
         d3.select("#selectButtonVis1").on("change", function(d){
 
             var mon = d3.select(this).property("value");
@@ -69,9 +70,11 @@ var vis1=function(filePath){
                     .datum(data)
                     .attr("d", d3.line().x(d=>xScale(d[0])).y(d=>yScale(d[1])))
                 path.transition().duration(800).style("opacity", 1)
+                d3.select("#vis1_title").transition().duration(1000).text("Number of Trips Throughout 2014")
             }
             else {
                 var month = mon - 1;
+                d3.select("#vis1_title").transition().duration(1000).text("Number of Trips in 2014." + mon )
                 var start = new Date(2014, month, 01);
                 var end = new Date(2014, month + 1, 0);
                 info = data.filter(d => d[0] >= start && d[0] <= end)
@@ -264,7 +267,7 @@ var vis4=function(filePath){
                           .attr("height", d => yScaleStack(d[0]) - yScaleStack(d[1]))
                           .attr("width",xScale.bandwidth())
                           .attr("opacity", 1)
-
+        
         
         var legend = svg.append("g").classed("legendVis4", true).attr("opacity", 1)
         legend.selectAll(".rect")
@@ -302,8 +305,9 @@ var vis4=function(filePath){
                         .attr("height", d=>height - yScaleCus(d.Customer))
                         .attr("opacity", 0)
                         .attr("fill", "#F56E05")
-
-
+        // var titleCus = d3.select("#vis4_title").text("Trips Among Casual Customers").attr("opacity", 0)
+        // var titleSub = d3.select("#vis4_title").text("Trips Among Subscribers").attr("opacity", 0)
+        var title = d3.select("#vis4_title").text("Trips Among All Users").attr("opacity", 1)
         const yScaleSub = d3.scaleLinear()
                          .domain([0, d3.max(bike, d=>d.Subscriber)])
                          .range([height, 0])
@@ -321,12 +325,12 @@ var vis4=function(filePath){
                         .attr("height", d=>height - yScaleSub(d.Subscriber))
                         .attr("opacity", 0)
                         .attr("fill", "#397EBF")
-
         
         var radios = d3.selectAll("input[name='controlBar']");
         radios.on("change", function(d) {
             var group = d3.select(this).attr("value");
             if (group == "stack") {
+                
                 yAxisSub.transition().attr("opacity", 0).duration(600);
                 barSub.transition().attr("opacity", 0).duration(600);
                 barCus.transition().attr("opacity", 0).duration(600);
@@ -334,8 +338,11 @@ var vis4=function(filePath){
                 legend.transition().attr("opacity", 1).duration(600);
                 barstack.transition().attr("opacity", 1).duration(600);
                 yAxisStack.transition().attr("opacity", 1).duration(600);
+                title.transition().text("Trips Among All Users").duration(600);
             }
             if (group == "Casual Customers") {
+                
+                title.transition().text("Trips Among Casual Customers").duration(600);
                 yAxisSub.transition().attr("opacity", 0).duration(600);
                 barSub.transition().attr("opacity", 0).duration(600);
                 barCus.transition().attr("opacity", 1).duration(600);
@@ -345,6 +352,7 @@ var vis4=function(filePath){
                 yAxisStack.transition().attr("opacity", 0).duration(600);
             }
             if (group == "Subscribers") {
+                title.transition().text("Trips Among Subscribers").duration(600);
                 yAxisSub.transition().attr("opacity", 1).duration(600);
                 barSub.transition().attr("opacity", 1).duration(600);
                 barCus.transition().attr("opacity", 0).duration(600);
@@ -442,7 +450,7 @@ var vis5=function(filePath){
             .attr("height", function(d){return(y(d.q1)-y(d.q3))})
             .attr("width", boxWidth )
             .attr("stroke", "black")
-            .style("fill", "#69b3a2")
+            .style("fill", "#397EBF")
 
       // Show the median
       svg
@@ -468,107 +476,107 @@ var vis5=function(filePath){
 
 }
 
-var discardedvis5=function(stationPath, tripPath){
-    Promise.all([
-      d3.csv(stationPath),
-      d3.json(tripPath) 
-    ]).then(
-        function (initialize) {
+// var discardedvis5=function(stationPath, tripPath){
+//     Promise.all([
+//       d3.csv(stationPath),
+//       d3.json(tripPath) 
+//     ]).then(
+//         function (initialize) {
 
-            let station = initialize[0]
-            let trip = initialize[1]
-
-
-            var width = 500;
-            var height = 300;
-            //var xCenter = [0, 100, 200， 300， 400， 500， 600,];
-            //var rScale = d3.scaleLinear().domain([0, d3.max(dataset.nodes, d => d.value)]).range([10, 45])
-            var force = d3.forceSimulation(station)
-                          .force("charge", d3.forceManyBody().strength(0))
-                          .force("link", d3.forceLink(data.edges))
-                          //.force("center", d3.forceCenter().x(width/2).y(height/2))
-                         // .force("collide", d3.forceCollide().radius(d => rScale(d.value)))
-                         // .force("x", d3.forceX().x(function(d) { return d.x}))
-                          //.force("y", d3.forceY().y(d => d.y))
+//             let station = initialize[0]
+//             let trip = initialize[1]
 
 
-            //create the color array using an existing colormap
-            var colors = d3.scaleOrdinal(d3.schemeCategory10);
+//             var width = 500;
+//             var height = 300;
+//             //var xCenter = [0, 100, 200， 300， 400， 500， 600,];
+//             //var rScale = d3.scaleLinear().domain([0, d3.max(dataset.nodes, d => d.value)]).range([10, 45])
+//             var force = d3.forceSimulation(station)
+//                           .force("charge", d3.forceManyBody().strength(0))
+//                           .force("link", d3.forceLink(data.edges))
+//                           //.force("center", d3.forceCenter().x(width/2).y(height/2))
+//                          // .force("collide", d3.forceCollide().radius(d => rScale(d.value)))
+//                          // .force("x", d3.forceX().x(function(d) { return d.x}))
+//                           //.force("y", d3.forceY().y(d => d.y))
 
-            //create SVG canvas
-            var svg = d3.select("#vis5_plot")
-                        .append("svg")
-                        .attr("width", width)
-                        .attr("height", height);
+
+//             //create the color array using an existing colormap
+//             var colors = d3.scaleOrdinal(d3.schemeCategory10);
+
+//             //create SVG canvas
+//             var svg = d3.select("#vis5_plot")
+//                         .append("svg")
+//                         .attr("width", width)
+//                         .attr("height", height);
             
-            //create edges
-            var edges = svg.selectAll("line")
-                .data(trip)
-                .enter()
-                .append("line")
-                .attr("stroke", "lightgray")
+//             //create edges
+//             var edges = svg.selectAll("line")
+//                 .data(trip)
+//                 .enter()
+//                 .append("line")
+//                 .attr("stroke", "lightgray")
             
-            //create nodes
-            var nodes = svg.selectAll("circle")
-                .data(station)
-                .enter()
-                .append("circle")
-                .style("fill", function(d, i) {
-                    return colors(i);
-                })
+//             //create nodes
+//             var nodes = svg.selectAll("circle")
+//                 .data(station)
+//                 .enter()
+//                 .append("circle")
+//                 .style("fill", function(d, i) {
+//                     return colors(i);
+//                 })
             
-            //when the simulation "ticks", execute the callback function
-            force.on("tick", function() {
+//             //when the simulation "ticks", execute the callback function
+//             force.on("tick", function() {
 
-                edges.attr("x1", function(d) { return d.source.x; })
-                     .attr("y1", function(d) { return d.source.y; })
-                     .attr("x2", function(d) { return d.target.x; })
-                     .attr("y2", function(d) { return d.target.y; });
+//                 edges.attr("x1", function(d) { return d.source.x; })
+//                      .attr("y1", function(d) { return d.source.y; })
+//                      .attr("x2", function(d) { return d.target.x; })
+//                      .attr("y2", function(d) { return d.target.y; });
             
-                nodes.attr("cx", function(d) { return d.x; })
-                     .attr("cy", function(d) { return d.y; })
-                     .attr("r", 10);
+//                 nodes.attr("cx", function(d) { return d.x; })
+//                      .attr("cy", function(d) { return d.y; })
+//                      .attr("r", 10);
 
-        });
-    })
-}
+//         });
+//     })
+// }
 
-//leave it 
-var discardedvis6=function(filePath){
+// //leave it 
+// var discardedvis6=function(filePath){
 
-    var margin = {top: 40, right: 300, bottom: 40, left: 300},
-            width = 800 - margin.left - margin.right,
-            height = 600 - margin.top - margin.bottom;
-    var svg = d3.select("#vis5_plot")
-                    .append("svg")
-                    .attr("width", width + margin.left + margin.right)
-                    .attr("height", height + margin.top + margin.bottom)
-                    .append("g")
-                    .attr("transform",
-                        "translate(" + margin.left + "," + margin.top + ")");
+//     var margin = {top: 40, right: 300, bottom: 40, left: 300},
+//             width = 800 - margin.left - margin.right,
+//             height = 600 - margin.top - margin.bottom;
+//     var svg = d3.select("#vis5_plot")
+//                     .append("svg")
+//                     .attr("width", width + margin.left + margin.right)
+//                     .attr("height", height + margin.top + margin.bottom)
+//                     .append("g")
+//                     .attr("transform",
+//                         "translate(" + margin.left + "," + margin.top + ")");
 
-    // Map and projection
-    const projection = d3.geoMercator()
-        .center([10, 47])                // GPS of location to zoom on
-        .scale(1200)                       // This is like the zoom
-        .translate([ width/2, height/2 ])
+//     // Map and projection
+//     const projection = d3.geoMercator()
+//         .center([10, 47])                // GPS of location to zoom on
+//         .scale(1200)                       // This is like the zoom
+//         .translate([ width/2, height/2 ])
 
-    // Load external data and boot
-    d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson").then( function(data){
+//     // Load external data and boot
+//     d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson").then( function(data){
 
-        // Filter data
-        data.features = data.features.filter(d => {console.log(d.properties.name); return d.properties.name=="France"})
+//         // Filter data
+//         data.features = data.features.filter(d => {console.log(d.properties.name); return d.properties.name=="France"})
 
-        // Draw the map
-        svg.append("g")
-            .selectAll("path")
-            .data(data.features)
-            .join("path")
-              .attr("fill", "grey")
-              .attr("d", d3.geoPath()
-                  .projection(projection)
-              )
-            .style("stroke", "none")
-    })
+//         // Draw the map
+//         svg.append("g")
+//             .selectAll("path")
+//             .data(data.features)
+//             .join("path")
+//               .attr("fill", "grey")
+//               .attr("d", d3.geoPath()
+//                   .projection(projection)
+//               )
+//             .style("stroke", "none")
+//     })
     
-}
+// }
